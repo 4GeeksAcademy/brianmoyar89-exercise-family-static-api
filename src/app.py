@@ -31,12 +31,68 @@ def handle_hello():
     # this is how you can use the Family datastructure by calling its methods
     members = jackson_family.get_all_members()
     response_body = {
-        "hello": "world",
         "family": members
     }
 
 
-    return jsonify(response_body), 200
+    return jsonify(members), 200
+
+######### POST 
+
+@app.route('/member', methods=['POST'])
+def add_member():
+    body = request.get_json()
+    """  Comentario 
+    {
+        "first_name": "brian",
+        "age": 33,
+        "lucky_numbers": [2,5,7]    
+    }
+    """
+
+    if isinstance(body, dict):
+        jackson_family.add_member(body)
+        return jsonify("Member added successfully"), 200
+    else:
+        return jsonify("Bad request"), 400
+
+ ###### GET
+ 
+@app.route('/member/<int:member_id>', methods=['GET'])
+def get_member(member_id):
+    print("id of family member", member_id)
+    member = jackson_family.get_member(member_id)
+    if member:
+        return jsonify(member), 200
+    else:
+        return jsonify({"msg": "member does not exist"}), 400 
+
+##### DELETE 
+
+@app.route('/member/<int:member_id>', methods=['DELETE'])
+def delete_member(member_id):
+
+    jackson_family.delete_member(member_id)
+    return jsonify({"done":True}),200
+    # print("id of family member", member_id)
+    # message = jackson_family.delete_member(member_id)
+    # if message:
+    #     return jsonify(message), 200
+    # else:
+    #     return jsonify({"msg": "member does not exist"}), 400 
+
+##### PUT 
+
+@app.route('/member/<int:member_id>', methods=['PUT'])
+def update_member(member_id):
+    body = request.get_json()
+    print("id of family member", member_id)
+    message = jackson_family.update_member(member_id, body)
+    if message:
+        return jsonify(message), 200
+    else:
+        return jsonify({"msg": "error updating member"}), 400 
+
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
